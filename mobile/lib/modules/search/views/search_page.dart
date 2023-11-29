@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/extensions/asyncvalue_extensions.dart';
 import 'package:immich_mobile/extensions/build_context_extensions.dart';
 import 'package:immich_mobile/modules/search/models/curated_content.dart';
-import 'package:immich_mobile/modules/search/providers/people.provider.dart';
+import 'package:immich_mobile/shared/providers/people.provider.dart';
 import 'package:immich_mobile/modules/search/providers/search_page_state.provider.dart';
 import 'package:immich_mobile/modules/search/ui/curated_people_row.dart';
 import 'package:immich_mobile/modules/search/ui/curated_places_row.dart';

@@ -5,6 +5,7 @@ import 'package:immich_mobile/shared/models/asset.dart';
 import 'package:immich_mobile/shared/models/etag.dart';
 import 'package:immich_mobile/shared/models/exif_info.dart';
 import 'package:immich_mobile/shared/models/logger_message.model.dart';
+import 'package:immich_mobile/shared/models/person.dart';
 import 'package:immich_mobile/shared/models/store.dart';
 import 'package:immich_mobile/shared/models/user.dart';
 import 'package:immich_mobile/shared/services/hash.service.dart';
@@ -49,6 +50,7 @@ void main() {
         StoreValueSchema,
         LoggerMessageSchema,
         ETagSchema,
+        PersonSchema,
       ],
       maxSizeMiB: 256,
       directory: ".",

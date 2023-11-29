@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/extensions/build_context_extensions.dart';
+import 'package:immich_mobile/shared/models/person.dart';
 import 'package:timezone/data/latest.dart';
 import 'package:immich_mobile/constants/locales.dart';
 import 'package:immich_mobile/modules/backup/background_service/background.service.dart';
@@ -100,6 +101,7 @@ Future<Isar> loadDb() async {
       DuplicatedAssetSchema,
       LoggerMessageSchema,
       ETagSchema,
+      PersonSchema,
       if (Platform.isAndroid) AndroidDeviceAssetSchema,
       if (Platform.isIOS) IOSDeviceAssetSchema,
     ],

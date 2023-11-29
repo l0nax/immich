@@ -1,11 +1,15 @@
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/modules/home/ui/asset_grid/asset_grid_data_structure.dart';
 import 'package:immich_mobile/modules/search/models/curated_content.dart';
-import 'package:immich_mobile/modules/search/services/person.service.dart';
 import 'package:immich_mobile/modules/settings/providers/app_settings.provider.dart';
 import 'package:immich_mobile/modules/settings/services/app_settings.service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../services/person.service.dart';
+
 part 'people.provider.g.dart';
+
+class PeopleNotifier extends StateNotifier<List>
 
 @riverpod
 Future<List<CuratedContent>> getCuratedPeople(

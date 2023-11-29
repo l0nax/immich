@@ -331,6 +331,10 @@ class ExifBottomSheet extends HookConsumerWidget {
       );
     }
 
+    buildPersons() {
+
+    }
+
     return GestureDetector(
       onTap: () {
         // FocusScope.of(context).unfocus();
@@ -402,6 +406,7 @@ class ExifBottomSheet extends HookConsumerWidget {
                         child: CircularProgressIndicator.adaptive(),
                       ),
                     ),
+                    const SizedBox(height: 8.0),
                     const SizedBox(height: 8.0),
                     buildLocation(),
                     SizedBox(height: hasCoordinates(exifInfo) ? 16.0 : 0.0),

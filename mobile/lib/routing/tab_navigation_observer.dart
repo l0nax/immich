@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/modules/album/providers/album.provider.dart';
 import 'package:immich_mobile/modules/memories/providers/memory.provider.dart';
-import 'package:immich_mobile/modules/search/providers/people.provider.dart';
+import 'package:immich_mobile/shared/providers/people.provider.dart';
 
 import 'package:immich_mobile/modules/search/providers/search_page_state.provider.dart';
 import 'package:immich_mobile/modules/album/providers/shared_album.provider.dart';
