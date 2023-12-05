@@ -56,4 +56,13 @@ class Person {
       birthDate: dto.birthDate,
     );
   }
+
+  static List<Person> remoteList(List<PersonResponseDto> dto) {
+    final people = <Person>[];
+    for (final personDto in dto) {
+      people.add(remote(personDto));
+    }
+
+    return people;
+  }
 }

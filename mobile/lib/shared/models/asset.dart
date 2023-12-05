@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:immich_mobile/shared/models/asset_person.dart';
 import 'package:immich_mobile/shared/models/exif_info.dart';
+import 'package:immich_mobile/shared/models/person.dart';
 import 'package:immich_mobile/shared/models/store.dart';
 import 'package:immich_mobile/utils/hash.dart';
 import 'package:isar/isar.dart';
@@ -33,7 +35,8 @@ class Asset {
         isArchived = remote.isArchived,
         isTrashed = remote.isTrashed,
         stackParentId = remote.stackParentId,
-        stackCount = remote.stackCount;
+        stackCount = remote.stackCount,
+        people = Person.remoteList(remote.people);
 
   Asset.local(AssetEntity local, List<int> hash)
       : localId = local.id,
@@ -82,6 +85,7 @@ class Asset {
     required this.isTrashed,
     this.stackParentId,
     required this.stackCount,
+    this.people,
   });
 
   @ignore
@@ -154,6 +158,9 @@ class Asset {
   String? stackParentId;
 
   @ignore
+  List<Person>? people;
+
+  @ignore
   int get stackChildrenCount => stackCount ?? 0;
 
   int? stackCount;
@@ -214,7 +221,8 @@ class Asset {
         isArchived == other.isArchived &&
         isTrashed == other.isTrashed &&
         stackCount == other.stackCount &&
-        stackParentId == other.stackParentId;
+        stackParentId == other.stackParentId &&
+        people == other.people;
   }
 
   @override
@@ -239,13 +247,15 @@ class Asset {
       isArchived.hashCode ^
       isTrashed.hashCode ^
       stackCount.hashCode ^
-      stackParentId.hashCode;
+      stackParentId.hashCode ^
+      people.hashCode;
 
   /// Returns `true` if this [Asset] can updated with values from parameter [a]
   bool canUpdate(Asset a) {
     assert(isInDb);
     assert(checksum == a.checksum);
     assert(a.storage != AssetState.merged);
+
     return a.updatedAt.isAfter(updatedAt) ||
         a.isRemote && !isRemote ||
         a.isLocal && !isLocal ||
@@ -260,7 +270,8 @@ class Asset {
         ((stackCount == null && a.stackCount != null) ||
             (stackCount != null &&
                 a.stackCount != null &&
-                stackCount != a.stackCount));
+                stackCount != a.stackCount)) ||
+        people != a.people;
   }
 
   /// Returns a new [Asset] with values from this and merged & updated with [a]
@@ -347,6 +358,7 @@ class Asset {
     ExifInfo? exifInfo,
     String? stackParentId,
     int? stackCount,
+    List<Person>? people,
   }) =>
       Asset(
         id: id ?? this.id,
@@ -369,13 +381,26 @@ class Asset {
         exifInfo: exifInfo ?? this.exifInfo,
         stackParentId: stackParentId ?? this.stackParentId,
         stackCount: stackCount ?? this.stackCount,
+        people: people ?? this.people,
       );
 
   Future<void> put(Isar db) async {
     await db.assets.put(this);
+
     if (exifInfo != null) {
       exifInfo!.id = id;
       await db.exifInfos.put(exifInfo!);
+    }
+
+    if (people != null && people!.isNotEmpty) {
+      await db.persons.putAll(people!);
+
+      final assetLink = <AssetPerson>[];
+      for (final person in people!) {
+        assetLink.add(AssetPerson(assetId: id, peopleId: person.id));
+      }
+
+      await db.assetPersons.putAll(assetLink);
     }
   }
 
@@ -408,17 +433,17 @@ class Asset {
   "remoteId": "${remoteId ?? "N/A"}",
   "localId": "${localId ?? "N/A"}",
   "checksum": "$checksum",
-  "ownerId": $ownerId, 
+  "ownerId": $ownerId,
   "livePhotoVideoId": "${livePhotoVideoId ?? "N/A"}",
   "stackCount": "$stackCount",
   "stackParentId": "${stackParentId ?? "N/A"}",
   "fileCreatedAt": "$fileCreatedAt",
-  "fileModifiedAt": "$fileModifiedAt", 
-  "updatedAt": "$updatedAt", 
-  "durationInSeconds": $durationInSeconds, 
+  "fileModifiedAt": "$fileModifiedAt",
+  "updatedAt": "$updatedAt",
+  "durationInSeconds": $durationInSeconds,
   "type": "$type",
-  "fileName": "$fileName", 
-  "isFavorite": $isFavorite, 
+  "fileName": "$fileName",
+  "isFavorite": $isFavorite,
   "isRemote": $isRemote,
   "storage": "$storage",
   "width": ${width ?? "N/A"},

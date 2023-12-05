@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart' hide Person;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/shared/models/asset.dart';
+import 'package:immich_mobile/shared/models/asset_person.dart';
 import 'package:immich_mobile/shared/models/exif_info.dart';
+import 'package:immich_mobile/shared/models/person.dart';
 import 'package:immich_mobile/shared/models/store.dart';
 import 'package:immich_mobile/shared/models/user.dart';
 import 'package:immich_mobile/shared/providers/api.provider.dart';
@@ -119,6 +122,30 @@ class AssetService {
       log.severe("Error deleteAssets  ${error.toString()}", error, stack);
     }
     return false;
+  }
+
+  Future<Asset> loadMetadata(Asset a) async {
+    final tmp = await loadExif(a);
+
+    if (tmp.people == null || tmp.people!.isNotEmpty) {
+      final assetPeopleLink = await _db.assetPersons
+          .where()
+          .filter()
+          .assetIdEqualTo(a.id)
+          .findAll();
+
+      final peopleList = <Person>[];
+      for (final link in assetPeopleLink) {
+        final person = await _db.persons.where().filter().idEqualTo(link.peopleId).findFirst();
+        if (person != null) {
+          peopleList.add(person);
+        }
+      }
+
+      tmp.people = peopleList;
+    }
+
+    return tmp;
   }
 
   /// Loads the exif information from the database. If there is none, loads

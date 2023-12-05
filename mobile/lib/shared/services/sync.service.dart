@@ -7,6 +7,7 @@ import 'package:immich_mobile/shared/models/asset.dart';
 import 'package:immich_mobile/shared/models/asset_person.dart';
 import 'package:immich_mobile/shared/models/etag.dart';
 import 'package:immich_mobile/shared/models/exif_info.dart';
+import 'package:immich_mobile/shared/models/person.dart';
 import 'package:immich_mobile/shared/models/store.dart';
 import 'package:immich_mobile/shared/models/user.dart';
 import 'package:immich_mobile/shared/providers/db.provider.dart';
@@ -726,17 +727,39 @@ class SyncService {
   }
 
   /// Inserts or updates the assets in the database with their ExifInfo (if any)
+  /// and corresponding people.
   Future<void> upsertAssetsWithExif(List<Asset> assets) async {
     if (assets.isEmpty) {
       return;
     }
+
     final exifInfos = assets.map((e) => e.exifInfo).whereNotNull().toList();
     try {
       await _db.writeTxn(() async {
         await _db.assets.putAll(assets);
         for (final Asset added in assets) {
           added.exifInfo?.id = added.id;
+
+          // first, add or update all people
+          if (added.people != null && added.people!.isNotEmpty) {
+            await _db.persons.putAll(added.people!);
+
+            // putAll will create duplicates, thus we need to
+            // remove all people assigned to this asset first
+            await _db.assetPersons
+                .where()
+                .filter()
+                .assetIdEqualTo(added.id)
+                .deleteAll();
+
+            // we now can add the new relations
+            final assetPeopleLink = added.people!
+                .map((e) => AssetPerson(assetId: added.id, peopleId: e.id))
+                .toList();
+            await _db.assetPersons.putAll(assetPeopleLink);
+          }
         }
+
         await _db.exifInfos.putAll(exifInfos);
       });
       _log.info("Upserted ${assets.length} assets into the DB");
@@ -765,6 +788,7 @@ class SyncService {
           );
         }
       }
+
       for (int i = 1; i < assets.length; i++) {
         if (Asset.compareByOwnerChecksum(assets[i - 1], assets[i]) == 0) {
           _log.warning(

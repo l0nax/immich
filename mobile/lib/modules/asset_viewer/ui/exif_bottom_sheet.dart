@@ -112,6 +112,7 @@ class ExifBottomSheet extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final assetWithExif = ref.watch(assetDetailProvider(asset));
     final exifInfo = (assetWithExif.value ?? asset).exifInfo;
+    final people = ((assetWithExif.value ?? asset).people ?? []);
     var textColor = context.isDarkTheme ? Colors.white : Colors.black;
 
     buildMap() {
@@ -179,6 +180,25 @@ class ExifBottomSheet extends HookConsumerWidget {
       );
     }
 
+    buildPersons() {
+      return Column(
+        children: [
+          // Location
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${people.length}",
+                style: context.textTheme.labelMedium?.copyWith(
+                  color: context.textTheme.labelMedium?.color?.withAlpha(150),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
     buildLocation() {
       // Guard no lat/lng
       if (!hasCoordinates(exifInfo)) {
@@ -199,6 +219,7 @@ class ExifBottomSheet extends HookConsumerWidget {
                 ),
               ).tr(),
               buildMap(),
+              buildPersons(),
               RichText(
                 text: TextSpan(
                   style: context.textTheme.labelLarge,
@@ -282,6 +303,8 @@ class ExifBottomSheet extends HookConsumerWidget {
       }
     }
 
+
+
     buildDetail() {
       final imgProperties = buildImageProperties();
 
@@ -331,9 +354,6 @@ class ExifBottomSheet extends HookConsumerWidget {
       );
     }
 
-    buildPersons() {
-
-    }
 
     return GestureDetector(
       onTap: () {
