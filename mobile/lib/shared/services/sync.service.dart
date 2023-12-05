@@ -189,6 +189,18 @@ class SyncService {
           .idProperty()
           .findAll();
 
+      final assetPersonToDelete = <int>[];
+      for (int assetId in idsToRemove) {
+        final tmp = await _db.assetPersons
+            .where()
+            .filter()
+            .assetIdEqualTo(assetId)
+            .idProperty()
+            .findAll();
+        assetPersonToDelete.addAll(tmp);
+      }
+
+      await _db.assetPersons.deleteAll(assetPersonToDelete);
       await _db.assets.deleteAll(idsToRemove);
       await _db.exifInfos.deleteAll(idsToRemove);
 
@@ -282,6 +294,17 @@ class SyncService {
       final List<int> idsToRemove = sharedAssetsToRemove(toDelete, existing);
       if (idsToRemove.isNotEmpty) {
         await _db.writeTxn(() async {
+          final assetPersonToDelete = <int>[];
+          for (int assetId in idsToRemove) {
+            final tmp = await _db.assetPersons
+                .where()
+                .filter()
+                .assetIdEqualTo(assetId)
+                .idProperty()
+                .findAll();
+            assetPersonToDelete.addAll(tmp);
+          }
+
           await _db.assets.deleteAll(idsToRemove);
           await _db.exifInfos.deleteAll(idsToRemove);
         });
@@ -481,6 +504,19 @@ class SyncService {
     );
     if (toDelete.isNotEmpty || toUpdate.isNotEmpty) {
       await _db.writeTxn(() async {
+        final assetPersonToDelete = <int>[];
+        for (int assetId in toDelete) {
+          final tmp = await _db.assetPersons
+              .where()
+              .filter()
+              .assetIdEqualTo(assetId)
+              .idProperty()
+              .findAll();
+          assetPersonToDelete.addAll(tmp);
+        }
+
+        await _db.assetPersons.deleteAll(assetPersonToDelete);
+
         await _db.assets.deleteAll(toDelete);
         await _db.exifInfos.deleteAll(toDelete);
         await _db.assets.putAll(toUpdate);

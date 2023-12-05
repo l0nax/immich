@@ -8,7 +8,11 @@ part 'asset_person.g.dart';
 class AssetPerson {
   Id id = Isar.autoIncrement;
 
-  final asset = IsarLink<Asset>();
+  int assetId;
+  int peopleId;
 
-  final person = IsarLink<Person>();
+  AssetPerson({
+    required this.assetId,
+    required this.peopleId,
+  });
 }

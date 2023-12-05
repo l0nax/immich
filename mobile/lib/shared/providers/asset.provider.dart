@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/modules/album/services/album.service.dart';
+import 'package:immich_mobile/shared/models/asset_person.dart';
 import 'package:immich_mobile/shared/models/exif_info.dart';
 import 'package:immich_mobile/shared/models/store.dart';
 import 'package:immich_mobile/shared/models/user.dart';
@@ -163,6 +164,18 @@ class AssetNotifier extends StateNotifier<bool> {
         }
 
         await _db.writeTxn(() async {
+          final assetPersonToDelete = <int>[];
+          for (int assetId in dbIds) {
+            final tmp = await _db.assetPersons
+                .where()
+                .filter()
+                .assetIdEqualTo(assetId)
+                .idProperty()
+                .findAll();
+            assetPersonToDelete.addAll(tmp);
+          }
+
+          await _db.assetPersons.deleteAll(assetPersonToDelete);
           await _db.assets.putAll(dbUpdates);
           await _db.exifInfos.deleteAll(dbIds);
           await _db.assets.deleteAll(dbIds);

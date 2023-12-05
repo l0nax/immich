@@ -16,27 +16,25 @@ extension GetAssetPersonCollection on Isar {
 const AssetPersonSchema = CollectionSchema(
   name: r'AssetPerson',
   id: -7511960018740336056,
-  properties: {},
+  properties: {
+    r'assetId': PropertySchema(
+      id: 0,
+      name: r'assetId',
+      type: IsarType.long,
+    ),
+    r'peopleId': PropertySchema(
+      id: 1,
+      name: r'peopleId',
+      type: IsarType.long,
+    )
+  },
   estimateSize: _assetPersonEstimateSize,
   serialize: _assetPersonSerialize,
   deserialize: _assetPersonDeserialize,
   deserializeProp: _assetPersonDeserializeProp,
   idName: r'id',
   indexes: {},
-  links: {
-    r'asset': LinkSchema(
-      id: -5760304866653576750,
-      name: r'asset',
-      target: r'Asset',
-      single: true,
-    ),
-    r'person': LinkSchema(
-      id: 7845466883478273504,
-      name: r'person',
-      target: r'Person',
-      single: true,
-    )
-  },
+  links: {},
   embeddedSchemas: {},
   getId: _assetPersonGetId,
   getLinks: _assetPersonGetLinks,
@@ -58,14 +56,21 @@ void _assetPersonSerialize(
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
-) {}
+) {
+  writer.writeLong(offsets[0], object.assetId);
+  writer.writeLong(offsets[1], object.peopleId);
+}
+
 AssetPerson _assetPersonDeserialize(
   Id id,
   IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = AssetPerson();
+  final object = AssetPerson(
+    assetId: reader.readLong(offsets[0]),
+    peopleId: reader.readLong(offsets[1]),
+  );
   object.id = id;
   return object;
 }
@@ -77,6 +82,10 @@ P _assetPersonDeserializeProp<P>(
   Map<Type, List<int>> allOffsets,
 ) {
   switch (propertyId) {
+    case 0:
+      return (reader.readLong(offset)) as P;
+    case 1:
+      return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -87,14 +96,12 @@ Id _assetPersonGetId(AssetPerson object) {
 }
 
 List<IsarLinkBase<dynamic>> _assetPersonGetLinks(AssetPerson object) {
-  return [object.asset, object.person];
+  return [];
 }
 
 void _assetPersonAttach(
     IsarCollection<dynamic> col, Id id, AssetPerson object) {
   object.id = id;
-  object.asset.attach(col, col.isar.collection<Asset>(), r'asset', id);
-  object.person.attach(col, col.isar.collection<Person>(), r'person', id);
 }
 
 extension AssetPersonQueryWhereSort
@@ -177,6 +184,60 @@ extension AssetPersonQueryWhere
 
 extension AssetPersonQueryFilter
     on QueryBuilder<AssetPerson, AssetPerson, QFilterCondition> {
+  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> assetIdEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'assetId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition>
+      assetIdGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'assetId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> assetIdLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'assetId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> assetIdBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'assetId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -229,45 +290,110 @@ extension AssetPersonQueryFilter
       ));
     });
   }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> peopleIdEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'peopleId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition>
+      peopleIdGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'peopleId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition>
+      peopleIdLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'peopleId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> peopleIdBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'peopleId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension AssetPersonQueryObject
     on QueryBuilder<AssetPerson, AssetPerson, QFilterCondition> {}
 
 extension AssetPersonQueryLinks
-    on QueryBuilder<AssetPerson, AssetPerson, QFilterCondition> {
-  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> asset(
-      FilterQuery<Asset> q) {
+    on QueryBuilder<AssetPerson, AssetPerson, QFilterCondition> {}
+
+extension AssetPersonQuerySortBy
+    on QueryBuilder<AssetPerson, AssetPerson, QSortBy> {
+  QueryBuilder<AssetPerson, AssetPerson, QAfterSortBy> sortByAssetId() {
     return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'asset');
+      return query.addSortBy(r'assetId', Sort.asc);
     });
   }
 
-  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> assetIsNull() {
+  QueryBuilder<AssetPerson, AssetPerson, QAfterSortBy> sortByAssetIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'asset', 0, true, 0, true);
+      return query.addSortBy(r'assetId', Sort.desc);
     });
   }
 
-  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> person(
-      FilterQuery<Person> q) {
+  QueryBuilder<AssetPerson, AssetPerson, QAfterSortBy> sortByPeopleId() {
     return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'person');
+      return query.addSortBy(r'peopleId', Sort.asc);
     });
   }
 
-  QueryBuilder<AssetPerson, AssetPerson, QAfterFilterCondition> personIsNull() {
+  QueryBuilder<AssetPerson, AssetPerson, QAfterSortBy> sortByPeopleIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'person', 0, true, 0, true);
+      return query.addSortBy(r'peopleId', Sort.desc);
     });
   }
 }
 
-extension AssetPersonQuerySortBy
-    on QueryBuilder<AssetPerson, AssetPerson, QSortBy> {}
-
 extension AssetPersonQuerySortThenBy
     on QueryBuilder<AssetPerson, AssetPerson, QSortThenBy> {
+  QueryBuilder<AssetPerson, AssetPerson, QAfterSortBy> thenByAssetId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'assetId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterSortBy> thenByAssetIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'assetId', Sort.desc);
+    });
+  }
+
   QueryBuilder<AssetPerson, AssetPerson, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -279,16 +405,52 @@ extension AssetPersonQuerySortThenBy
       return query.addSortBy(r'id', Sort.desc);
     });
   }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterSortBy> thenByPeopleId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'peopleId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AssetPerson, AssetPerson, QAfterSortBy> thenByPeopleIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'peopleId', Sort.desc);
+    });
+  }
 }
 
 extension AssetPersonQueryWhereDistinct
-    on QueryBuilder<AssetPerson, AssetPerson, QDistinct> {}
+    on QueryBuilder<AssetPerson, AssetPerson, QDistinct> {
+  QueryBuilder<AssetPerson, AssetPerson, QDistinct> distinctByAssetId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'assetId');
+    });
+  }
+
+  QueryBuilder<AssetPerson, AssetPerson, QDistinct> distinctByPeopleId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'peopleId');
+    });
+  }
+}
 
 extension AssetPersonQueryProperty
     on QueryBuilder<AssetPerson, AssetPerson, QQueryProperty> {
   QueryBuilder<AssetPerson, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<AssetPerson, int, QQueryOperations> assetIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'assetId');
+    });
+  }
+
+  QueryBuilder<AssetPerson, int, QQueryOperations> peopleIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'peopleId');
     });
   }
 }
