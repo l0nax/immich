@@ -11,6 +11,7 @@ import 'package:immich_mobile/modules/memories/providers/memory.provider.dart';
 import 'package:immich_mobile/modules/onboarding/providers/gallery_permission.provider.dart';
 import 'package:immich_mobile/modules/settings/providers/notification_permission.provider.dart';
 import 'package:immich_mobile/shared/providers/asset.provider.dart';
+import 'package:immich_mobile/shared/providers/people.provider.dart';
 import 'package:immich_mobile/shared/providers/server_info.provider.dart';
 import 'package:immich_mobile/shared/providers/tab.provider.dart';
 import 'package:immich_mobile/shared/providers/websocket.provider.dart';
@@ -58,7 +59,7 @@ class AppStateNotiifer extends StateNotifier<AppStateEnum> {
           _ref.read(assetProvider.notifier).getAllAsset();
           _ref.read(assetProvider.notifier).getPartnerAssets();
         case TabEnum.search:
-        // nothing to do
+          _ref.read(peopleNotifierProvider.notifier).getAllPeople();
         case TabEnum.sharing:
           _ref.read(assetProvider.notifier).getPartnerAssets();
           _ref.read(sharedAlbumProvider.notifier).getAllSharedAlbums();

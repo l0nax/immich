@@ -3,24 +3,44 @@ import 'package:immich_mobile/modules/home/ui/asset_grid/asset_grid_data_structu
 import 'package:immich_mobile/modules/search/models/curated_content.dart';
 import 'package:immich_mobile/modules/settings/providers/app_settings.provider.dart';
 import 'package:immich_mobile/modules/settings/services/app_settings.service.dart';
+import 'package:immich_mobile/shared/models/person.dart';
+import 'package:immich_mobile/shared/providers/db.provider.dart';
+import 'package:isar/isar.dart';
+import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../services/person.service.dart';
 
 part 'people.provider.g.dart';
 
-class PeopleNotifier extends StateNotifier<List>
+@riverpod
+class PeopleNotifier extends _$PeopleNotifier {
+  final log = Logger('PeopleNotifier');
+
+  @override
+  Future<bool> build() async {
+    return false;
+  }
+
+  Future<void> getAllPeople() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final PersonService personService = ref.read(personServiceProvider);
+      await personService.refreshPeople();
+
+      // trigger update
+      final oldState = state.value ?? false;
+      return !oldState;
+    });
+  }
+}
 
 @riverpod
-Future<List<CuratedContent>> getCuratedPeople(
-  GetCuratedPeopleRef ref,
-) async {
-  final PersonService personService = ref.read(personServiceProvider);
+Future<List<CuratedContent>> getCuratedPeople(GetCuratedPeopleRef ref) async {
+  final people = await ref.watch(personServiceProvider).getCuratedPeople();
 
-  final curatedPeople = await personService.getCuratedPeople();
-
-  return curatedPeople
-      .map((p) => CuratedContent(id: p.id, label: p.name))
+  return people
+      .map((p) => CuratedContent(id: p.remoteId, label: p.name))
       .toList();
 }
 

@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/shared/models/album.dart';
 import 'package:immich_mobile/shared/models/asset.dart';
+import 'package:immich_mobile/shared/models/asset_person.dart';
 import 'package:immich_mobile/shared/models/etag.dart';
 import 'package:immich_mobile/shared/models/exif_info.dart';
 import 'package:immich_mobile/shared/models/store.dart';
@@ -187,8 +188,10 @@ class SyncService {
           .localIdIsNull()
           .idProperty()
           .findAll();
+
       await _db.assets.deleteAll(idsToRemove);
       await _db.exifInfos.deleteAll(idsToRemove);
+
       final onlyLocal = await _db.assets.remote(idsToDelete).findAll();
       if (onlyLocal.isNotEmpty) {
         for (final Asset a in onlyLocal) {

@@ -6,7 +6,7 @@ part of 'people.provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getCuratedPeopleHash() => r'2a534553812abe69abce2c2e41aa62b8de16e9d0';
+String _$getCuratedPeopleHash() => r'd25e15e21d77a8bca5686d70b486bd6d4a62ac10';
 
 /// See also [getCuratedPeople].
 @ProviderFor(getCuratedPeople)
@@ -316,5 +316,22 @@ class _UpdatePersonNameProviderElement
   @override
   String get updatedName => (origin as UpdatePersonNameProvider).updatedName;
 }
+
+String _$peopleNotifierHash() => r'9d384d7647abce83e284ab8650aac35af5d92369';
+
+/// See also [PeopleNotifier].
+@ProviderFor(PeopleNotifier)
+final peopleNotifierProvider =
+    AutoDisposeAsyncNotifierProvider<PeopleNotifier, bool>.internal(
+  PeopleNotifier.new,
+  name: r'peopleNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$peopleNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$PeopleNotifier = AutoDisposeAsyncNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -43,6 +43,7 @@ class SearchPage extends HookConsumerWidget {
     useEffect(
       () {
         searchFocusNode = FocusNode();
+        Future(() => ref.read(peopleNotifierProvider.notifier).getAllPeople());
         return () => searchFocusNode.dispose();
       },
       [],
