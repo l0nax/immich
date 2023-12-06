@@ -127,6 +127,12 @@ class AssetService {
   Future<Asset> loadMetadata(Asset a) async {
     final tmp = await loadExif(a);
 
+    // abort early if the asset is only present on the client
+    // since the person matching is done on the server.
+    if (!tmp.isRemote) {
+      return tmp;
+    }
+
     if (tmp.people == null || tmp.people!.isEmpty) {
       final assetPeopleLink = await _db.assetPersons
           .where()
@@ -145,6 +151,22 @@ class AssetService {
       tmp.people = peopleList;
     }
 
+    // if people is still not set, we take an attempt to
+    // update the client information
+    if (tmp.people == null || tmp.people!.isEmpty) {
+      final dto = await _apiService.assetApi.getAssetById(a.remoteId!);
+      if (dto == null || dto.people.isEmpty) {
+        return tmp;
+      }
+
+      if (!tmp.isInDb) {
+        log.severe("[loadMetadata] asset is not present in DB");
+      }
+
+      tmp.people = Person.remoteList(dto.people);
+      await _syncService.upsertAssetsWithExif([tmp]);
+    }
+
     return tmp;
   }
 
@@ -152,6 +174,7 @@ class AssetService {
   /// the exif info from the server (remote assets only)
   Future<Asset> loadExif(Asset a) async {
     a.exifInfo ??= await _db.exifInfos.get(a.id);
+
     // fileSize is always filled on the server but not set on client
     if (a.exifInfo?.fileSize == null) {
       if (a.isRemote) {
