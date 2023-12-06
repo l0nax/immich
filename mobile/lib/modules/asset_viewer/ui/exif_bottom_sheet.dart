@@ -219,7 +219,6 @@ class ExifBottomSheet extends HookConsumerWidget {
                 ),
               ).tr(),
               buildMap(),
-              buildPersons(),
               RichText(
                 text: TextSpan(
                   style: context.textTheme.labelLarge,
@@ -372,6 +371,7 @@ class ExifBottomSheet extends HookConsumerWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16.0),
             child: LayoutBuilder(
               builder: (context, constraints) {
+                // TODO(l0nax): Add buildPersons()
                 if (constraints.maxWidth > 600) {
                   // Two column
                   return Padding(
@@ -426,6 +426,7 @@ class ExifBottomSheet extends HookConsumerWidget {
                         child: CircularProgressIndicator.adaptive(),
                       ),
                     ),
+                    buildPersons(),
                     const SizedBox(height: 8.0),
                     const SizedBox(height: 8.0),
                     buildLocation(),

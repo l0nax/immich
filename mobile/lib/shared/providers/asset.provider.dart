@@ -251,8 +251,8 @@ final assetProvider = StateNotifierProvider<AssetNotifier, bool>((ref) {
 final assetDetailProvider =
     StreamProvider.autoDispose.family<Asset, Asset>((ref, asset) async* {
   yield await ref.watch(assetServiceProvider).loadMetadata(asset);
-  final db = ref.watch(dbProvider);
 
+  final db = ref.watch(dbProvider);
   await for (final a in db.assets.watchObject(asset.id)) {
     if (a != null) yield await ref.watch(assetServiceProvider).loadMetadata(a);
   }

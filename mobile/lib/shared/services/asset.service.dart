@@ -127,7 +127,7 @@ class AssetService {
   Future<Asset> loadMetadata(Asset a) async {
     final tmp = await loadExif(a);
 
-    if (tmp.people == null || tmp.people!.isNotEmpty) {
+    if (tmp.people == null || tmp.people!.isEmpty) {
       final assetPeopleLink = await _db.assetPersons
           .where()
           .filter()
