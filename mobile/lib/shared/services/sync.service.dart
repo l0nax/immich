@@ -161,18 +161,22 @@ class SyncService {
     final DateTime now = DateTime.now();
     final (toUpsert, toDelete) = await getChangedAssets(user, since);
     if (toUpsert == null || toDelete == null) return null;
+
     try {
       if (toDelete.isNotEmpty) {
         await handleRemoteAssetRemoval(toDelete);
       }
+
       if (toUpsert.isNotEmpty) {
         final (_, updated) = await _linkWithExistingFromDb(toUpsert);
         await upsertAssetsWithExif(updated);
       }
+
       if (toUpsert.isNotEmpty || toDelete.isNotEmpty) {
         await _updateUserAssetsETag(user, now);
         return true;
       }
+
       return false;
     } on IsarError catch (e) {
       _log.severe("Failed to sync remote assets to db: $e");

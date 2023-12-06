@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart' hide Person;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/shared/models/asset.dart';
 import 'package:immich_mobile/shared/models/asset_person.dart';
@@ -84,11 +83,13 @@ class AssetService {
         if (assets == null) {
           return null;
         }
+
         allAssets.addAll(assets.map(Asset.remote));
         if (assets.length < chunkSize) {
           break;
         }
       }
+
       return allAssets;
     } catch (error, stack) {
       log.severe(
@@ -129,7 +130,7 @@ class AssetService {
 
     // abort early if the asset is only present on the client
     // since the person matching is done on the server.
-    if (!tmp.isRemote) {
+    if (tmp.isLocal) {
       return tmp;
     }
 
@@ -142,13 +143,18 @@ class AssetService {
 
       final peopleList = <Person>[];
       for (final link in assetPeopleLink) {
-        final person = await _db.persons.where().filter().idEqualTo(link.peopleId).findFirst();
+        final person = await _db.persons
+            .where()
+            .filter()
+            .idEqualTo(link.peopleId)
+            .findFirst();
+
         if (person != null) {
           peopleList.add(person);
         }
       }
 
-      tmp.people = peopleList;
+      tmp.people = Person.sortList(peopleList);
     }
 
     // if people is still not set, we take an attempt to
@@ -163,7 +169,7 @@ class AssetService {
         log.severe("[loadMetadata] asset is not present in DB");
       }
 
-      tmp.people = Person.remoteList(dto.people);
+      tmp.people = Person.sortList(Person.remoteList(dto.people));
       await _syncService.upsertAssetsWithExif([tmp]);
     }
 
@@ -193,6 +199,7 @@ class AssetService {
         // TODO implement local exif info parsing
       }
     }
+
     return a;
   }
 

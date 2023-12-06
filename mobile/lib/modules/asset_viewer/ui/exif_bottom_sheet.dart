@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/extensions/build_context_extensions.dart';
+import 'package:immich_mobile/shared/models/person.dart';
 import 'package:timezone/timezone.dart';
 import 'package:immich_mobile/modules/asset_viewer/ui/description_input.dart';
 import 'package:immich_mobile/modules/map/ui/map_thumbnail.dart';
@@ -15,6 +17,13 @@ import 'package:immich_mobile/shared/ui/drag_sheet.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:immich_mobile/utils/bytes_units.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../routing/router.dart';
+import '../../../shared/providers/people.provider.dart';
+import '../../../shared/ui/scaffold_error_body.dart';
+import '../../search/models/curated_content.dart';
+import '../../search/ui/curated_people_row.dart';
+import '../../search/ui/person_name_edit_form.dart';
 
 class ExifBottomSheet extends HookConsumerWidget {
   final Asset asset;
@@ -113,6 +122,8 @@ class ExifBottomSheet extends HookConsumerWidget {
     final assetWithExif = ref.watch(assetDetailProvider(asset));
     final exifInfo = (assetWithExif.value ?? asset).exifInfo;
     final people = ((assetWithExif.value ?? asset).people ?? []);
+    final double imageSize = math.min(context.width / 3, 150);
+
     var textColor = context.isDarkTheme ? Colors.white : Colors.black;
 
     buildMap() {
@@ -180,20 +191,46 @@ class ExifBottomSheet extends HookConsumerWidget {
       );
     }
 
+    showPersonNameEditModel(
+      String personId,
+      String personName,
+    ) {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return PersonNameEditForm(personId: personId, personName: personName);
+        },
+      );
+    }
+
     buildPersons() {
+      // There are no people
+      if (people.isEmpty) {
+        return Container();
+      }
+
+      final curatedPeople = people
+          .map((p) => CuratedContent(id: p.remoteId, label: p.name))
+          .toList();
+
       return Column(
         children: [
-          // Location
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "${people.length}",
-                style: context.textTheme.labelMedium?.copyWith(
-                  color: context.textTheme.labelMedium?.color?.withAlpha(150),
-                ),
-              ),
-            ],
+          SizedBox(
+            height: imageSize,
+            child: CuratedPeopleRow(
+              content: curatedPeople,
+              onTap: (content, index) {
+                context.autoPush(
+                  PersonResultRoute(
+                    personId: content.id,
+                    personName: content.label,
+                  ),
+                );
+              },
+              onNameTap: (person, index) => {
+                showPersonNameEditModel(person.id, person.label),
+              },
+            ),
           ),
         ],
       );
@@ -302,8 +339,6 @@ class ExifBottomSheet extends HookConsumerWidget {
       }
     }
 
-
-
     buildDetail() {
       final imgProperties = buildImageProperties();
 
@@ -352,7 +387,6 @@ class ExifBottomSheet extends HookConsumerWidget {
         ],
       );
     }
-
 
     return GestureDetector(
       onTap: () {

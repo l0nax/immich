@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:immich_mobile/shared/models/asset.dart';
+import 'package:immich_mobile/shared/models/asset_person.dart';
 import 'package:immich_mobile/shared/models/person.dart';
 import 'package:immich_mobile/shared/providers/api.provider.dart';
 import 'package:immich_mobile/shared/providers/db.provider.dart';
-import 'package:immich_mobile/shared/services/sync.service.dart';
 import 'package:immich_mobile/utils/diff.dart';
 import 'package:isar/isar.dart';
 import 'package:logging/logging.dart';
@@ -28,32 +28,10 @@ class PersonService {
 
   Future<List<Person>> getCuratedPeople() async {
     try {
-      final persons = await _db.persons
-          .filter()
-          .isHiddenEqualTo(false)
-          .findAll();
+      final persons =
+          await _db.persons.filter().isHiddenEqualTo(false).findAll();
 
-      persons.sort((a, b) {
-        final aNameEmpty = a.name.isEmpty;
-        final bNameEmpty = b.name.isEmpty;
-
-        if (aNameEmpty && bNameEmpty) {
-          return 0;
-        }
-
-        if (aNameEmpty && !bNameEmpty) {
-          return 1;
-        }
-
-        if (bNameEmpty && !aNameEmpty) {
-          return -1;
-        }
-
-
-        return a.name.compareTo(b.name);
-      });
-
-      return persons;
+      return Person.sortList(persons);
     } catch (error, stack) {
       _log.severe("Error while fetching local people", error, stack);
       return [];
@@ -101,12 +79,19 @@ class PersonService {
         await _db.writeTxn(() async {
           await _db.persons.putAll(toUpdate);
           await _db.persons.putAll(toAdd);
-
-          // TODO(l0nax): Remove asset <-> person linking
           await _db.persons.deleteAll(toDelete);
+
+          // delete all Asset<->Person links
+          for (final personId in toDelete) {
+            await _db.assetPersons
+                .where()
+                .filter()
+                .peopleIdEqualTo(personId)
+                .deleteAll();
+          }
         });
-      } on IsarError catch (e) {
-        _log.severe("Failed to sync remote people with DB");
+      } on IsarError catch (error) {
+        _log.severe("Failed to sync remote people with DB", error);
       }
 
       return true;
@@ -119,7 +104,10 @@ class PersonService {
   /// Compares if the local object is different from the remote one
   /// and adds it to updateList if true.
   bool _isRemoteEqual(
-      PersonResponseDto remote, Person local, List<Person> updateList) {
+    PersonResponseDto remote,
+    Person local,
+    List<Person> updateList,
+  ) {
     var remotePerson = Person.remote(remote);
     remotePerson.id = local.id;
 

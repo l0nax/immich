@@ -65,4 +65,29 @@ class Person {
 
     return people;
   }
+
+  /// Sorts the given list in a deterministic and user friendly way.
+  /// For usability reasons people is returned.
+  static List<Person> sortList(List<Person> people) {
+    people.sort((a, b) {
+      final aNameEmpty = a.name.isEmpty;
+      final bNameEmpty = b.name.isEmpty;
+
+      if (aNameEmpty && bNameEmpty) {
+        return 0;
+      }
+
+      if (aNameEmpty && !bNameEmpty) {
+        return 1;
+      }
+
+      if (bNameEmpty && !aNameEmpty) {
+        return -1;
+      }
+
+      return a.name.compareTo(b.name);
+    });
+
+    return people;
+  }
 }

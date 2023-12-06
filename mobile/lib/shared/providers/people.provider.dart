@@ -68,8 +68,12 @@ Future<bool> updatePersonName(
   final person = await personService.updateName(personId, updatedName);
 
   if (person != null && person.name == updatedName) {
+    // update people list
+    await ref.read(personServiceProvider).refreshPeople();
     ref.invalidate(getCuratedPeopleProvider);
+
     return true;
   }
+
   return false;
 }
