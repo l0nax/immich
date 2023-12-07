@@ -118,7 +118,7 @@ class ExifBottomSheet extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final assetWithExif = ref.watch(assetDetailProvider(asset));
     final exifInfo = (assetWithExif.value ?? asset).exifInfo;
-    final people = ((assetWithExif.value ?? asset).people ?? []);
+    final people = (assetWithExif.value ?? asset).people;
     final double imageSize = math.min(context.width / 3, 150);
 
     var textColor = context.isDarkTheme ? Colors.white : Colors.black;
@@ -202,7 +202,7 @@ class ExifBottomSheet extends HookConsumerWidget {
 
     buildPersons() {
       // There are no people
-      if (people.isEmpty) {
+      if (people == null || people.isEmpty) {
         return Container();
       }
 
@@ -212,6 +212,16 @@ class ExifBottomSheet extends HookConsumerWidget {
 
       return Column(
         children: [
+          Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "exif_bottom_sheet_people",
+              style: context.textTheme.labelMedium?.copyWith(
+                color: context.textTheme.labelMedium?.color?.withAlpha(200),
+                fontWeight: FontWeight.w600,
+              ),
+            ).tr(),
+          ),
           SizedBox(
             height: imageSize,
             child: CuratedPeopleRow(

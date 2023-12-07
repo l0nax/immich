@@ -172,7 +172,7 @@ class _PersonAssetsProviderElement
   String get personId => (origin as PersonAssetsProvider).personId;
 }
 
-String _$updatePersonNameHash() => r'c7179a7cc558669c3b30b03fbca7782a42f2b6fd';
+String _$updatePersonNameHash() => r'33a3a2cec6b960a9d0d61a2303274f3eeeb34c9f';
 
 /// See also [updatePersonName].
 @ProviderFor(updatePersonName)
