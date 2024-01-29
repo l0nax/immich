@@ -24,6 +24,7 @@ class ImmichSearchBar extends HookConsumerWidget
     focusSearch() {
       searchTermController.clear();
       ref.watch(searchPageStateProvider.notifier).getSuggestedSearchTerms();
+      ref.watch(searchPageStateProvider.notifier).getPeopleWithNames();
       ref.watch(searchPageStateProvider.notifier).enableSearch();
       ref.watch(searchPageStateProvider.notifier).setSearchTerm("");
 

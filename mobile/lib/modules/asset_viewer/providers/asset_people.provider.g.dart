@@ -7,7 +7,7 @@ part of 'asset_people.provider.dart';
 // **************************************************************************
 
 String _$assetPeopleNotifierHash() =>
-    r'192a4ee188f781000fe43f1675c49e1081ccc631';
+    r'9835b180984a750c91e923e7b64dbda94f6d7574';
 
 /// Copied from Dart SDK
 class _SystemHash {

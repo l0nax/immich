@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:immich_mobile/modules/search/models/curated_content.dart';
+import 'package:immich_mobile/modules/search/ui/curated_people_row.dart';
 import 'package:immich_mobile/shared/models/asset.dart';
 import 'package:immich_mobile/shared/providers/api.provider.dart';
 import 'package:immich_mobile/shared/providers/db.provider.dart';
@@ -47,6 +49,19 @@ class SearchService {
     } catch (e) {
       debugPrint("[ERROR] [searchAsset] ${e.toString()}");
       return null;
+    }
+  }
+
+  Future<List<CuratedContent>?> getCuratedPeopleWithNames() async {
+    try {
+      final people = await _apiService.personApi.getAllPeople();
+      return people?.people
+          .where((element) => element.name.isNotEmpty)
+          .map((p) => CuratedContent(id: p.id, label: p.name))
+          .toList();
+    } catch (e) {
+      debugPrint("Error [getCuratedPeopleWithNames] ${e.toString()}");
+      return [];
     }
   }
 
