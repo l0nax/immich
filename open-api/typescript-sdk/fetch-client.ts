@@ -1913,7 +1913,8 @@ export function updatePartner({ id, updatePartnerDto }: {
         body: updatePartnerDto
     })));
 }
-export function getAllPeople({ withHidden }: {
+export function getAllPeople({ ifNoneMatch, withHidden }: {
+    ifNoneMatch?: string;
     withHidden?: boolean;
 }, opts?: Oazapfts.RequestOpts) {
     return oazapfts.ok(oazapfts.fetchJson<{
@@ -1922,7 +1923,10 @@ export function getAllPeople({ withHidden }: {
     }>(`/person${QS.query(QS.explode({
         withHidden
     }))}`, {
-        ...opts
+        ...opts,
+        headers: oazapfts.mergeHeaders(opts?.headers, {
+            "if-none-match": ifNoneMatch
+        })
     }));
 }
 export function createPerson(opts?: Oazapfts.RequestOpts) {

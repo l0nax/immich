@@ -73,7 +73,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getAllPeople**
-> PeopleResponseDto getAllPeople(withHidden)
+> PeopleResponseDto getAllPeople(ifNoneMatch, withHidden)
 
 
 
@@ -96,10 +96,11 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PersonApi();
+final ifNoneMatch = ifNoneMatch_example; // String | ETag of data already cached on the client
 final withHidden = true; // bool | 
 
 try {
-    final result = api_instance.getAllPeople(withHidden);
+    final result = api_instance.getAllPeople(ifNoneMatch, withHidden);
     print(result);
 } catch (e) {
     print('Exception when calling PersonApi->getAllPeople: $e\n');
@@ -110,6 +111,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+ **ifNoneMatch** | **String**| ETag of data already cached on the client | [optional] 
  **withHidden** | **bool**|  | [optional] [default to false]
 
 ### Return type

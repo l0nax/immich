@@ -3927,6 +3927,15 @@
         "operationId": "getAllPeople",
         "parameters": [
           {
+            "name": "if-none-match",
+            "in": "header",
+            "description": "ETag of data already cached on the client",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "withHidden",
             "required": false,
             "in": "query",

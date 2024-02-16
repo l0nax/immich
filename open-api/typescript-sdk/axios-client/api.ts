@@ -13608,11 +13608,12 @@ export const PersonApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * 
+         * @param {string} [ifNoneMatch] ETag of data already cached on the client
          * @param {boolean} [withHidden] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllPeople: async (withHidden?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAllPeople: async (ifNoneMatch?: string, withHidden?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/person`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -13636,6 +13637,10 @@ export const PersonApiAxiosParamCreator = function (configuration?: Configuratio
 
             if (withHidden !== undefined) {
                 localVarQueryParameter['withHidden'] = withHidden;
+            }
+
+            if (ifNoneMatch != null) {
+                localVarHeaderParameter['if-none-match'] = String(ifNoneMatch);
             }
 
 
@@ -14028,12 +14033,13 @@ export const PersonApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string} [ifNoneMatch] ETag of data already cached on the client
          * @param {boolean} [withHidden] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllPeople(withHidden?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PeopleResponseDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllPeople(withHidden, options);
+        async getAllPeople(ifNoneMatch?: string, withHidden?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PeopleResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllPeople(ifNoneMatch, withHidden, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['PersonApi.getAllPeople']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
@@ -14162,7 +14168,7 @@ export const PersonApiFactory = function (configuration?: Configuration, basePat
          * @throws {RequiredError}
          */
         getAllPeople(requestParameters: PersonApiGetAllPeopleRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<PeopleResponseDto> {
-            return localVarFp.getAllPeople(requestParameters.withHidden, options).then((request) => request(axios, basePath));
+            return localVarFp.getAllPeople(requestParameters.ifNoneMatch, requestParameters.withHidden, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -14245,6 +14251,13 @@ export const PersonApiFactory = function (configuration?: Configuration, basePat
  * @interface PersonApiGetAllPeopleRequest
  */
 export interface PersonApiGetAllPeopleRequest {
+    /**
+     * ETag of data already cached on the client
+     * @type {string}
+     * @memberof PersonApiGetAllPeople
+     */
+    readonly ifNoneMatch?: string
+
     /**
      * 
      * @type {boolean}
@@ -14411,7 +14424,7 @@ export class PersonApi extends BaseAPI {
      * @memberof PersonApi
      */
     public getAllPeople(requestParameters: PersonApiGetAllPeopleRequest = {}, options?: RawAxiosRequestConfig) {
-        return PersonApiFp(this.configuration).getAllPeople(requestParameters.withHidden, options).then((request) => request(this.axios, this.basePath));
+        return PersonApiFp(this.configuration).getAllPeople(requestParameters.ifNoneMatch, requestParameters.withHidden, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,18 +1,24 @@
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
+import 'package:immich_mobile/modules/search/models/curated_content.dart';
+import 'package:immich_mobile/shared/models/album.dart';
 
 class SearchPageState {
   final String searchTerm;
   final bool isSearchEnabled;
   final List<String> searchSuggestion;
   final List<String> userSuggestedSearchTerms;
+  final List<Album>? suggestedAlbums;
+  final List<CuratedContent>? suggestedPeople;
 
   SearchPageState({
     required this.searchTerm,
     required this.isSearchEnabled,
     required this.searchSuggestion,
     required this.userSuggestedSearchTerms,
+    this.suggestedAlbums,
+    this.suggestedPeople,
   });
 
   SearchPageState copyWith({
@@ -20,6 +26,9 @@ class SearchPageState {
     bool? isSearchEnabled,
     List<String>? searchSuggestion,
     List<String>? userSuggestedSearchTerms,
+    List<Album>? suggestedAlbums,
+    List<CuratedContent>? suggestedPeople,
+    List<CuratedContent>? availablePeople,
   }) {
     return SearchPageState(
       searchTerm: searchTerm ?? this.searchTerm,
@@ -27,6 +36,8 @@ class SearchPageState {
       searchSuggestion: searchSuggestion ?? this.searchSuggestion,
       userSuggestedSearchTerms:
           userSuggestedSearchTerms ?? this.userSuggestedSearchTerms,
+      suggestedAlbums: suggestedAlbums ?? this.suggestedAlbums,
+      suggestedPeople: suggestedPeople ?? this.suggestedPeople,
     );
   }
 

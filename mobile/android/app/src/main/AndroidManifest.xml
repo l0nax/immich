@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="app.alextran.immich"
   xmlns:tools="http://schemas.android.com/tools">
-  <application android:label="Immich" android:name=".ImmichApp" android:usesCleartextTraffic="true"
+  <application android:label="Immich (DEBUG)" android:name=".ImmichApp" android:usesCleartextTraffic="true"
     android:icon="@mipmap/ic_launcher" android:requestLegacyExternalStorage="true">
 
     <meta-data

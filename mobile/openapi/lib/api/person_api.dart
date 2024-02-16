@@ -60,8 +60,11 @@ class PersonApi {
   /// Performs an HTTP 'GET /person' operation and returns the [Response].
   /// Parameters:
   ///
+  /// * [String] ifNoneMatch:
+  ///   ETag of data already cached on the client
+  ///
   /// * [bool] withHidden:
-  Future<Response> getAllPeopleWithHttpInfo({ bool? withHidden, }) async {
+  Future<Response> getAllPeopleWithHttpInfo({ String? ifNoneMatch, bool? withHidden, }) async {
     // ignore: prefer_const_declarations
     final path = r'/person';
 
@@ -74,6 +77,10 @@ class PersonApi {
 
     if (withHidden != null) {
       queryParams.addAll(_queryParams('', 'withHidden', withHidden));
+    }
+
+    if (ifNoneMatch != null) {
+      headerParams[r'if-none-match'] = parameterToString(ifNoneMatch);
     }
 
     const contentTypes = <String>[];
@@ -92,9 +99,12 @@ class PersonApi {
 
   /// Parameters:
   ///
+  /// * [String] ifNoneMatch:
+  ///   ETag of data already cached on the client
+  ///
   /// * [bool] withHidden:
-  Future<PeopleResponseDto?> getAllPeople({ bool? withHidden, }) async {
-    final response = await getAllPeopleWithHttpInfo( withHidden: withHidden, );
+  Future<PeopleResponseDto?> getAllPeople({ String? ifNoneMatch, bool? withHidden, }) async {
+    final response = await getAllPeopleWithHttpInfo( ifNoneMatch: ifNoneMatch, withHidden: withHidden, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

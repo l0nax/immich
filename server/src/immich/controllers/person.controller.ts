@@ -13,7 +13,7 @@ import {
   PersonUpdateDto,
 } from '@app/domain';
 import { Body, Controller, Get, Next, Param, Post, Put, Query, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { NextFunction, Response } from 'express';
 import { Auth, Authenticated, FileResponse } from '../app.guard';
 import { UseValidation, sendFile } from '../app.utils';
@@ -24,9 +24,15 @@ import { UUIDParamDto } from './dto/uuid-param.dto';
 @Authenticated()
 @UseValidation()
 export class PersonController {
-  constructor(private service: PersonService) {}
+  constructor(private service: PersonService) { }
 
   @Get()
+  @ApiHeader({
+    name: 'if-none-match',
+    description: 'ETag of data already cached on the client',
+    required: false,
+    schema: { type: 'string' },
+  })
   getAllPeople(@Auth() auth: AuthDto, @Query() withHidden: PersonSearchDto): Promise<PeopleResponseDto> {
     return this.service.getAll(auth, withHidden);
   }
