@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:http/http.dart';
 import 'package:immich_mobile/shared/models/asset.dart';
+import 'package:immich_mobile/shared/models/person.dart';
+import 'package:immich_mobile/shared/models/store.dart';
 import 'package:immich_mobile/shared/providers/api.provider.dart';
 import 'package:immich_mobile/shared/providers/db.provider.dart';
 import 'package:immich_mobile/shared/services/api.service.dart';
@@ -20,9 +25,38 @@ class PersonService {
 
   PersonService(this._apiService, this._db);
 
-  Future<List<PersonResponseDto>> getCuratedPeople() async {
+  get utf8 => null;
+
+  Future<List<Person>> getCuratedPeople() async {
     try {
-      final peopleResponseDto = await _apiService.personApi.getAllPeople();
+      final knownEtag = Store.tryGet(StoreKey.peopleETag);
+      final response = await _apiService.personApi.getAllPeopleWithHttpInfo(
+        ifNoneMatch: knownEtag,
+      );
+
+      if (response.statusCode == 304) {
+        final people = await _db.persons.where().findAll();
+        return people;
+      } else if (response.statusCode >= HttpStatus.badRequest) {
+        throw ApiException(
+          response.statusCode,
+          await _decodeBodyBytes(response),
+        );
+      }
+
+      if (response.body.isNotEmpty &&
+          response.statusCode != HttpStatus.noContent) {
+        final responseBody = await _decodeBodyBytes(response);
+        final etag = response.headers[HttpHeaders.etagHeader];
+        final data = (await apiClient.deserializeAsync(
+          responseBody,
+          'List<AssetResponseDto>',
+        ) as List)
+            .cast<AssetResponseDto>()
+            .toList();
+        return (data, etag);
+      }
+
       return peopleResponseDto?.people ?? [];
     } catch (error, stack) {
       _log.severe("Error while fetching curated people", error, stack);
@@ -53,5 +87,17 @@ class PersonService {
       _log.severe("Error while updating person name", error, stack);
     }
     return null;
+  }
+
+  /// Returns the decoded body as UTF-8 if the given headers indicate an 'application/json'
+  /// content type. Otherwise, returns the decoded body as decoded by dart:http package.
+  Future<String> _decodeBodyBytes(Response response) async {
+    final contentType = response.headers['content-type'];
+    return contentType != null &&
+            contentType.toLowerCase().startsWith('application/json')
+        ? response.bodyBytes.isEmpty
+            ? ''
+            : utf8.decode(response.bodyBytes)
+        : response.body;
   }
 }
