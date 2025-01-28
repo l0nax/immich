@@ -1,19 +1,18 @@
 import { authenticate } from '$lib/utils/auth';
-import { api } from '@api';
+import { getFormatter } from '$lib/utils/i18n';
+import { getAuditFiles } from '@immich/sdk';
 import type { PageLoad } from './$types';
 
 export const load = (async () => {
-  const user = await authenticate({ admin: true });
-  const {
-    data: { orphans, extras },
-  } = await api.auditApi.getAuditFiles();
+  await authenticate({ admin: true });
+  const { orphans, extras } = await getAuditFiles();
+  const $t = await getFormatter();
 
   return {
-    user,
     orphans,
     extras,
     meta: {
-      title: 'Repair',
+      title: $t('repair'),
     },
   };
 }) satisfies PageLoad;
