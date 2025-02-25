@@ -1,158 +1,75 @@
-import { AuthUserDto } from '@app/domain';
+import { AuthDto } from 'src/dtos/auth.dto';
+import { SessionEntity } from 'src/entities/session.entity';
+import { SharedLinkEntity } from 'src/entities/shared-link.entity';
 
-export const adminSignupStub = {
-  name: 'Immich Admin',
-  email: 'admin@immich.app',
-  password: 'Password123',
-};
-
-export const userSignupStub = {
-  ...adminSignupStub,
-  memoriesEnabled: true,
-};
-
-export const loginStub = {
+const authUser = {
   admin: {
-    email: 'admin@immich.app',
-    password: 'Password123',
+    id: 'admin_id',
+    name: 'admin',
+    email: 'admin@test.com',
+    isAdmin: true,
+    quotaSizeInBytes: null,
+    quotaUsageInBytes: 0,
   },
-};
-
-export const changePasswordStub = {
-  password: 'Password123',
-  newPassword: 'Password1234',
+  user1: {
+    id: 'user-id',
+    name: 'User 1',
+    email: 'immich@test.com',
+    isAdmin: false,
+    quotaSizeInBytes: null,
+    quotaUsageInBytes: 0,
+  },
 };
 
 export const authStub = {
-  admin: Object.freeze<AuthUserDto>({
-    id: 'admin_id',
-    email: 'admin@test.com',
-    isAdmin: true,
-    isPublicUser: false,
-    isAllowUpload: true,
-    externalPath: null,
+  admin: Object.freeze<AuthDto>({ user: authUser.admin }),
+  user1: Object.freeze<AuthDto>({
+    user: authUser.user1,
+    session: {
+      id: 'token-id',
+    } as SessionEntity,
   }),
-  user1: Object.freeze<AuthUserDto>({
-    id: 'user-id',
-    email: 'immich@test.com',
-    isAdmin: false,
-    isPublicUser: false,
-    isAllowUpload: true,
-    isAllowDownload: true,
-    isShowMetadata: true,
-    accessTokenId: 'token-id',
-    externalPath: null,
-  }),
-  user2: Object.freeze<AuthUserDto>({
-    id: 'user-2',
-    email: 'user2@immich.app',
-    isAdmin: false,
-    isPublicUser: false,
-    isAllowUpload: true,
-    isAllowDownload: true,
-    isShowMetadata: true,
-    accessTokenId: 'token-id',
-    externalPath: null,
-  }),
-  external1: Object.freeze<AuthUserDto>({
-    id: 'user-id',
-    email: 'immich@test.com',
-    isAdmin: false,
-    isPublicUser: false,
-    isAllowUpload: true,
-    isAllowDownload: true,
-    isShowMetadata: true,
-    accessTokenId: 'token-id',
-    externalPath: '/data/user1',
-  }),
-  adminSharedLink: Object.freeze<AuthUserDto>({
-    id: 'admin_id',
-    email: 'admin@test.com',
-    isAdmin: true,
-    isAllowUpload: true,
-    isAllowDownload: true,
-    isPublicUser: true,
-    isShowMetadata: true,
-    sharedLinkId: '123',
-  }),
-  adminSharedLinkNoExif: Object.freeze<AuthUserDto>({
-    id: 'admin_id',
-    email: 'admin@test.com',
-    isAdmin: true,
-    isAllowUpload: true,
-    isAllowDownload: true,
-    isPublicUser: true,
-    isShowMetadata: false,
-    sharedLinkId: '123',
-  }),
-  readonlySharedLink: Object.freeze<AuthUserDto>({
-    id: 'admin_id',
-    email: 'admin@test.com',
-    isAdmin: true,
-    isAllowUpload: false,
-    isAllowDownload: false,
-    isPublicUser: true,
-    isShowMetadata: true,
-    sharedLinkId: '123',
-    accessTokenId: 'token-id',
-  }),
-};
-
-export const loginResponseStub = {
-  admin: {
-    response: {
-      accessToken: expect.any(String),
-      name: 'Immich Admin',
-      isAdmin: true,
-      profileImagePath: '',
-      shouldChangePassword: true,
-      userEmail: 'admin@immich.app',
-      userId: expect.any(String),
-    },
-  },
-  user1oauth: {
-    response: {
-      accessToken: 'cmFuZG9tLWJ5dGVz',
-      userId: 'user-id',
-      userEmail: 'immich@test.com',
-      name: 'immich_name',
-      profileImagePath: '',
+  user2: Object.freeze<AuthDto>({
+    user: {
+      id: 'user-2',
+      name: 'User 2',
+      email: 'user2@immich.cloud',
       isAdmin: false,
-      shouldChangePassword: false,
+      quotaSizeInBytes: null,
+      quotaUsageInBytes: 0,
     },
-    cookie: [
-      'immich_access_token=cmFuZG9tLWJ5dGVz; HttpOnly; Secure; Path=/; Max-Age=34560000; SameSite=Lax;',
-      'immich_auth_type=oauth; HttpOnly; Secure; Path=/; Max-Age=34560000; SameSite=Lax;',
-    ],
-  },
-  user1password: {
-    response: {
-      accessToken: 'cmFuZG9tLWJ5dGVz',
-      userId: 'user-id',
-      userEmail: 'immich@test.com',
-      name: 'immich_name',
-      profileImagePath: '',
-      isAdmin: false,
-      shouldChangePassword: false,
-    },
-    cookie: [
-      'immich_access_token=cmFuZG9tLWJ5dGVz; HttpOnly; Secure; Path=/; Max-Age=34560000; SameSite=Lax;',
-      'immich_auth_type=password; HttpOnly; Secure; Path=/; Max-Age=34560000; SameSite=Lax;',
-    ],
-  },
-  user1insecure: {
-    response: {
-      accessToken: 'cmFuZG9tLWJ5dGVz',
-      userId: 'user-id',
-      userEmail: 'immich@test.com',
-      name: 'immich_name',
-      profileImagePath: '',
-      isAdmin: false,
-      shouldChangePassword: false,
-    },
-    cookie: [
-      'immich_access_token=cmFuZG9tLWJ5dGVz; HttpOnly; Path=/; Max-Age=34560000; SameSite=Lax;',
-      'immich_auth_type=password; HttpOnly; Path=/; Max-Age=34560000; SameSite=Lax;',
-    ],
-  },
+    session: {
+      id: 'token-id',
+    } as SessionEntity,
+  }),
+  adminSharedLink: Object.freeze<AuthDto>({
+    user: authUser.admin,
+    sharedLink: {
+      id: '123',
+      showExif: true,
+      allowDownload: true,
+      allowUpload: true,
+      key: Buffer.from('shared-link-key'),
+    } as SharedLinkEntity,
+  }),
+  adminSharedLinkNoExif: Object.freeze<AuthDto>({
+    user: authUser.admin,
+    sharedLink: {
+      id: '123',
+      showExif: false,
+      allowDownload: true,
+      allowUpload: true,
+      key: Buffer.from('shared-link-key'),
+    } as SharedLinkEntity,
+  }),
+  passwordSharedLink: Object.freeze<AuthDto>({
+    user: authUser.admin,
+    sharedLink: {
+      id: '123',
+      allowUpload: false,
+      allowDownload: false,
+      password: 'password-123',
+      showExif: true,
+    } as SharedLinkEntity,
+  }),
 };

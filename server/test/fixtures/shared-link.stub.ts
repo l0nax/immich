@@ -1,9 +1,14 @@
-import { AlbumResponseDto, AssetResponseDto, ExifResponseDto, mapUser, SharedLinkResponseDto } from '@app/domain';
-import { AssetType, SharedLinkEntity, SharedLinkType, UserEntity } from '@app/infra/entities';
-import { assetStub } from './asset.stub';
-import { authStub } from './auth.stub';
-import { libraryStub } from './library.stub';
-import { userStub } from './user.stub';
+import { AlbumResponseDto } from 'src/dtos/album.dto';
+import { AssetResponseDto } from 'src/dtos/asset-response.dto';
+import { ExifResponseDto } from 'src/dtos/exif.dto';
+import { SharedLinkResponseDto } from 'src/dtos/shared-link.dto';
+import { mapUser } from 'src/dtos/user.dto';
+import { SharedLinkEntity } from 'src/entities/shared-link.entity';
+import { UserEntity } from 'src/entities/user.entity';
+import { AssetOrder, AssetStatus, AssetType, SharedLinkType } from 'src/enum';
+import { assetStub } from 'test/fixtures/asset.stub';
+import { authStub } from 'test/fixtures/auth.stub';
+import { userStub } from 'test/fixtures/user.stub';
 
 const today = new Date();
 const tomorrow = new Date();
@@ -46,23 +51,17 @@ const assetResponse: AssetResponseDto = {
   ownerId: 'user_id_1',
   deviceId: 'device_id_1',
   type: AssetType.VIDEO,
+  originalMimeType: 'image/jpeg',
   originalPath: 'fake_path/jpeg',
   originalFileName: 'asset_1.jpeg',
-  resized: false,
   thumbhash: null,
   fileModifiedAt: today,
-  isExternal: false,
-  isReadOnly: false,
   isOffline: false,
   fileCreatedAt: today,
   localDateTime: today,
   updatedAt: today,
   isFavorite: false,
   isArchived: false,
-  smartInfo: {
-    tags: [],
-    objects: ['a', 'b', 'c'],
-  },
   duration: '0:00:00.00000',
   exifInfo: assetInfo,
   livePhotoVideoId: null,
@@ -72,13 +71,12 @@ const assetResponse: AssetResponseDto = {
   isTrashed: false,
   libraryId: 'library-id',
   hasMetadata: true,
-  stackCount: 0,
 };
 
 const assetResponseWithoutMetadata = {
   id: 'id_1',
   type: AssetType.VIDEO,
-  resized: false,
+  originalMimeType: 'image/jpeg',
   thumbhash: null,
   localDateTime: today,
   duration: '0:00:00.00000',
@@ -95,18 +93,19 @@ const albumResponse: AlbumResponseDto = {
   id: 'album-123',
   ownerId: 'admin_id',
   owner: mapUser(userStub.admin),
-  sharedUsers: [],
+  albumUsers: [],
   shared: false,
   hasSharedLink: false,
   assets: [],
   assetCount: 1,
   isActivityEnabled: true,
+  order: AssetOrder.DESC,
 };
 
 export const sharedLinkStub = {
   individual: Object.freeze({
     id: '123',
-    userId: authStub.admin.id,
+    userId: authStub.admin.user.id,
     user: userStub.admin,
     key: sharedLinkBytes,
     type: SharedLinkType.INDIVIDUAL,
@@ -121,7 +120,7 @@ export const sharedLinkStub = {
   } as SharedLinkEntity),
   valid: Object.freeze({
     id: '123',
-    userId: authStub.admin.id,
+    userId: authStub.admin.user.id,
     user: userStub.admin,
     key: sharedLinkBytes,
     type: SharedLinkType.ALBUM,
@@ -138,7 +137,7 @@ export const sharedLinkStub = {
   } as SharedLinkEntity),
   expired: Object.freeze({
     id: '123',
-    userId: authStub.admin.id,
+    userId: authStub.admin.user.id,
     user: userStub.admin,
     key: sharedLinkBytes,
     type: SharedLinkType.ALBUM,
@@ -154,7 +153,7 @@ export const sharedLinkStub = {
   } as SharedLinkEntity),
   readonlyNoExif: Object.freeze<SharedLinkEntity>({
     id: '123',
-    userId: authStub.admin.id,
+    userId: authStub.admin.user.id,
     user: userStub.admin,
     key: sharedLinkBytes,
     type: SharedLinkType.ALBUM,
@@ -169,7 +168,7 @@ export const sharedLinkStub = {
     albumId: 'album-123',
     album: {
       id: 'album-123',
-      ownerId: authStub.admin.id,
+      ownerId: authStub.admin.user.id,
       owner: userStub.admin,
       albumName: 'Test Album',
       description: '',
@@ -178,19 +177,20 @@ export const sharedLinkStub = {
       deletedAt: null,
       albumThumbnailAsset: null,
       albumThumbnailAssetId: null,
-      sharedUsers: [],
+      albumUsers: [],
       sharedLinks: [],
       isActivityEnabled: true,
+      order: AssetOrder.DESC,
       assets: [
         {
           id: 'id_1',
+          status: AssetStatus.ACTIVE,
           owner: undefined as unknown as UserEntity,
           ownerId: 'user_id_1',
           deviceAssetId: 'device_asset_id_1',
           deviceId: 'device_id_1',
           type: AssetType.VIDEO,
           originalPath: 'fake_path/jpeg',
-          resizePath: '',
           checksum: Buffer.from('file hash', 'utf8'),
           fileModifiedAt: today,
           fileCreatedAt: today,
@@ -200,18 +200,8 @@ export const sharedLinkStub = {
           isFavorite: false,
           isArchived: false,
           isExternal: false,
-          isReadOnly: false,
           isOffline: false,
-          libraryId: 'library-id',
-          library: libraryStub.uploadLibrary1,
-          smartInfo: {
-            assetId: 'id_1',
-            tags: [],
-            objects: ['a', 'b', 'c'],
-            asset: null as any,
-            clipEmbedding: [0.12, 0.13, 0.14],
-          },
-          webpPath: '',
+          files: [],
           thumbhash: null,
           encodedVideoPath: '',
           duration: null,
@@ -245,23 +235,25 @@ export const sharedLinkStub = {
             exposureTime: '1/16',
             fps: 100,
             asset: null as any,
-            exifTextSearchableColumn: '',
             profileDescription: 'sRGB',
             bitsPerSample: 8,
             colorspace: 'sRGB',
+            autoStackId: null,
+            rating: 3,
           },
           tags: [],
           sharedLinks: [],
           faces: [],
           sidecarPath: null,
           deletedAt: null,
+          duplicateId: null,
         },
       ],
     },
   }),
   passwordRequired: Object.freeze<SharedLinkEntity>({
     id: '123',
-    userId: authStub.admin.id,
+    userId: authStub.admin.user.id,
     user: userStub.admin,
     key: sharedLinkBytes,
     type: SharedLinkType.ALBUM,
@@ -307,21 +299,6 @@ export const sharedLinkResponseStub = {
     type: SharedLinkType.ALBUM,
     userId: 'admin_id',
   }),
-  readonly: Object.freeze<SharedLinkResponseDto>({
-    id: '123',
-    userId: 'admin_id',
-    key: sharedLinkBytes.toString('base64url'),
-    type: SharedLinkType.ALBUM,
-    createdAt: today,
-    expiresAt: tomorrow,
-    description: null,
-    password: null,
-    allowUpload: false,
-    allowDownload: false,
-    showMetadata: true,
-    album: albumResponse,
-    assets: [assetResponse],
-  }),
   readonlyNoMetadata: Object.freeze<SharedLinkResponseDto>({
     id: '123',
     userId: 'admin_id',
@@ -334,7 +311,7 @@ export const sharedLinkResponseStub = {
     allowUpload: false,
     allowDownload: false,
     showMetadata: false,
-    album: { ...albumResponse, startDate: assetResponse.fileCreatedAt, endDate: assetResponse.fileCreatedAt },
+    album: { ...albumResponse, startDate: assetResponse.localDateTime, endDate: assetResponse.localDateTime },
     assets: [{ ...assetResponseWithoutMetadata, exifInfo: undefined }],
   }),
 };

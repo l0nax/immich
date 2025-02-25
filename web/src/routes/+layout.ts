@@ -1,23 +1,19 @@
-import { api } from '../api';
+import { init } from '$lib/utils/server';
 import type { LayoutLoad } from './$types';
-
-const getUser = async () => {
-  try {
-    const { data: user } = await api.userApi.getMyUserInfo();
-    return user;
-  } catch {
-    return null;
-  }
-};
 
 export const ssr = false;
 export const csr = true;
 
-export const load = (async () => {
-  const user = await getUser();
+export const load = (async ({ fetch }) => {
+  let error;
+  try {
+    await init(fetch);
+  } catch (initError) {
+    error = initError;
+  }
 
   return {
-    user,
+    error,
     meta: {
       title: 'Immich',
     },

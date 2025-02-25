@@ -1,16 +1,17 @@
 import { authenticate } from '$lib/utils/auth';
-import { api } from '@api';
+import { getFormatter } from '$lib/utils/i18n';
+import { getConfig } from '@immich/sdk';
 import type { PageLoad } from './$types';
 
 export const load = (async () => {
-  const user = await authenticate({ admin: true });
-  const { data: configs } = await api.systemConfigApi.getConfig();
+  await authenticate({ admin: true });
+  const configs = await getConfig();
+  const $t = await getFormatter();
 
   return {
-    user,
     configs,
     meta: {
-      title: 'System Settings',
+      title: $t('admin.system_settings'),
     },
   };
 }) satisfies PageLoad;
