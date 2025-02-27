@@ -1,16 +1,19 @@
 import { authenticate } from '$lib/utils/auth';
-import { api } from '@api';
+import { getFormatter } from '$lib/utils/i18n';
+import { getAllAlbums } from '@immich/sdk';
 import type { PageLoad } from './$types';
 
 export const load = (async () => {
-  const user = await authenticate();
-  const { data: albums } = await api.albumApi.getAllAlbums();
+  await authenticate();
+  const sharedAlbums = await getAllAlbums({ shared: true });
+  const albums = await getAllAlbums({});
+  const $t = await getFormatter();
 
   return {
-    user,
     albums,
+    sharedAlbums,
     meta: {
-      title: 'Albums',
+      title: $t('albums'),
     },
   };
 }) satisfies PageLoad;

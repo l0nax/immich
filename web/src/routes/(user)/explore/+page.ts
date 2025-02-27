@@ -1,17 +1,18 @@
 import { authenticate } from '$lib/utils/auth';
-import { api } from '@api';
+import { getFormatter } from '$lib/utils/i18n';
+import { getAllPeople, getExploreData } from '@immich/sdk';
 import type { PageLoad } from './$types';
 
 export const load = (async () => {
-  const user = await authenticate();
-  const { data: items } = await api.searchApi.getExploreData();
-  const { data: response } = await api.personApi.getAllPeople({ withHidden: false });
+  await authenticate();
+  const [items, response] = await Promise.all([getExploreData(), getAllPeople({ withHidden: false })]);
+  const $t = await getFormatter();
+
   return {
-    user,
     items,
     response,
     meta: {
-      title: 'Explore',
+      title: $t('explore'),
     },
   };
 }) satisfies PageLoad;
